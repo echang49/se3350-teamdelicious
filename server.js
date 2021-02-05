@@ -19,5 +19,21 @@ app.get('*', (req,res) =>{
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
 
+//function to find assigned courses to every professor
+/*app.get('/courses', (req, res) => {
+    
+});*/
+
+//function to 
+app.post('/adminAddCourse', (req,res)=>{
+    
+})
+
+
+
 app.listen(5000);
 console.log('App is listening on port 5000');
+
+
+
+
