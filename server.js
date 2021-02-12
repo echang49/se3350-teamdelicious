@@ -25,59 +25,6 @@ function findColumn(json, name) {
     return undefined;
 }
 
-function distributeTAs(acceptedIndividuals, coursesJSON) {
-    let applications = [];
-
-
-
-    //Sorts all applications by status and qualificationFactor (status takes priority)
-    applications = applications.sort((a, b) => {
-        let n = a.status - b.status;
-        if (n !== 0) {
-            return n
-        }
-        return b.qualificationFactor - a.qualificationFactor
-    })
-
-
-
-    //Holds objects including courseCode, hours needed, and TAs array
-    let courses = []
-    //CREATING COURSES OBJECTS IN COURSES ARRAY
-    for (i = 1; i < coursesJSON.length; i++) {
-        let course = {
-            courseCode: coursesJSON[i][0],
-            hoursToFill: 20,
-            TAs: []
-        }
-        courses.push(course);
-    }
-
-    console.log(applications);
-
-    //adding TAs to courses based off of previous sort
-    for (i = 0; i < applications.length; i++) {
-        let requestedCourse = applications[i].course;
-
-        let coursePosition;
-
-        for (i = 0; i < courses.length; i++) {
-            if (requestedCourse == courses[i].courseCode) {
-                coursePosition = i;
-                break;
-            }
-        }
-
-        if ((courses[coursePosition].hoursToFill - applications[i].hours) >= 0) {
-            confirmedTA = applications[i];
-            courses[coursePosition].TAs.push(confirmedTA.email)
-            applications = applications.filter(application => application.email != confirmedTA.email);
-        }
-    }
-
-    return courses
-}
-
 app.post('/api/admin/matchTA', (req, res) => {
     const { applicantJSON, coursesJSON } = req.body;
 
@@ -107,7 +54,7 @@ app.post('/api/admin/matchTA', (req, res) => {
     acceptedIndividuals.shift();
 
     let userArray = [];
-    //SCHEMA: [Course Code, Applicant Name, Applicant Email, prioritization, ApplicantScore, ProfScore, ProfRankScore, Hours]
+    //SCHEMA: [Course Code, Applicant Name, Applicant Email, prioritization, ApplicantScore, ProfScore, ProfRankScore, Hours, qualificationFactor]
     for (let i in acceptedIndividuals) {
         userArray.push([acceptedIndividuals[i][courseLocation[0]], acceptedIndividuals[i][nameLocation], acceptedIndividuals[i][emailLocation], acceptedIndividuals[i][prioritizationLocation], undefined, undefined, undefined, acceptedIndividuals[i][courseHoursLocation]]);
     }
@@ -130,7 +77,7 @@ app.post('/api/admin/matchTA', (req, res) => {
         userArray[i][4] = Math.round(((max - (ranking - 1))/max) * 100) / 100;
     }
 
-    // //STD-14
+    //STD-14
     for(let i in acceptedIndividuals) {
         let questions = 0;
         let yesCount = 0;
@@ -145,22 +92,79 @@ app.post('/api/admin/matchTA', (req, res) => {
         }
         userArray[i][5] = yesCount / questions;
     }
-    console.log(userArray);
+
+    //RANKING ALGORITHM
+    for(let i of userArray) {
+        //FORMULA: ApplicantScore*0.7 + ProfScore*0.3 + ProfRankScore*0;
+        i[8] = i[4]*0.7 + i[5]*0.3 + 0;
+    }
+
+    //STD-15
+    //Sorts all applications by status and qualificationFactor (status takes priority)
+    userArray = userArray.sort((a, b) => {
+        let n = a[3] - b[3];
+        if (n !== 0) {
+            return n;
+        }
+        return b[8] - a[8];
+    })
+
+    //Holds objects including courseCode, hours needed, and TAs array
+    let courses = []
+    //CREATING COURSES OBJECTS IN COURSES ARRAY
+    for (i = 1; i < coursesJSON.length; i++) {
+        let course = {
+            courseCode: coursesJSON[i][0],
+            hoursToFill: 20,
+            TAs: []
+        }
+        courses.push(course);
+    }
+
+    // //adding TAs to courses based off of previous sort
+    while(userArray.length > 0) {
+        let requestedCourse = userArray[0][0];
+        let coursePosition;
+
+        for (i = 0; i < courses.length; i++) {
+            if (requestedCourse == courses[i].courseCode) {
+                coursePosition = i;
+                break;
+            }
+        }
+
+        if ((courses[coursePosition].hoursToFill - userArray[0][7]) >= 0) {
+            confirmedTA = userArray[0];
+            courses[coursePosition].TAs.push(confirmedTA[2])
+            userArray = userArray.filter(user => user[2] !== confirmedTA[2]);
+        }
+    }
+
+    console.log(courses);
+
+
+    res.end();
+})
+
+//function to 
+app.post('/api/admin/addCourse', (req, res) => {
+
+})
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/client/build/index.html'));
+});
+
+app.listen(5000);
+console.log('App is listening on port 5000');
 
 
 
 
 
 
-    //console.log(distributeTAs(acceptedIndividuals, coursesJSON));
 
-    // //check STD-14
-    // let updatedArray = [];
-    // [course, name, email, status, ta hours, score, profScore]
-
-
-
-
+//console.log(distributeTAs(acceptedIndividuals, coursesJSON));
 
     // //check STD-15
     // let firstPriority =[];
@@ -188,55 +192,3 @@ app.post('/api/admin/matchTA', (req, res) => {
     //         i[priorityLocation] = 0.33;
     //     }
     // }
-
-    //RANKING ALGORITHM
-
-    res.end();
-
-    /*
-        checking priorities
-        priority 1) within term and fundable 
-        check under application status column
-        priority 2) passed term and officially fundable
-        priority 3) anything else
-
-        sort them into arrays based on priority?
-
-        /*checking priorities for the professor
-        Check under columns Q1,Q2,Q3
-        using a counter? check the best applicants
-    */
-})
-
-//function to 
-app.post('/api/admin/addCourse', (req, res) => {
-
-})
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '/client/build/index.html'));
-});
-
-app.listen(5000);
-console.log('App is listening on port 5000');
-
-
-
-
-
-
-
-/*
-[
-  [
-    'Course Code',
-    'Course Name',
-    'Lec hours',
-    'Lab/Tutorial hours',
-    'No. of Sections'
-  ],
-  [ 'SE123', 'Java Programming', 3, 2, 1 ],
-  [ 'ECE456', 'Data Management', 3, 3, 1 ],
-  [ 'ES678', 'Matlab', 3, null, 1 ]
-]
-*/
