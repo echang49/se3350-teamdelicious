@@ -74,6 +74,8 @@ function distributeTAs(acceptedIndividuals, coursesJSON) {
             applications = applications.filter(application => application.email != confirmedTA.email);
         }
     }
+
+    return courses
 }
 
 app.post('/api/admin/matchTA', (req, res) => {
