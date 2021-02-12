@@ -1,12 +1,14 @@
 //COMPOSITION
 body {
     font-family: 'Roboto', sans-serif;
-    
+    min-height: 100vh;
+    margin: 0;
 }
 
 //UTILITY
     .box {
         display: flex;
+        flex-direction: column;
         background-color: hsl(0,0,95);
         padding: 20px;
     }
@@ -18,5 +20,28 @@ body {
     }
 
 //BLOCKS
+    .matchTA {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%,-50%);
+        .box {
+            border-radius: 3px;
+            border-top-left-radius:15px;
+            border-bottom-right-radius:15px;
+            filter: drop-shadow(5px 3px 7px hsl(0,0,20));
+            .title {
+                font-size: 20px;
+            }
+            .upload {
+                display: flex;
+                flex-direction: column;
+                margin: 5px auto;
+            }
+            button {
+                margin-top: 10px;
+            }
+        }
+        
+    }
 
 //EXCEPTIONS
