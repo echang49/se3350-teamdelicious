@@ -28,47 +28,54 @@ function findColumn(json, name) {
 app.post('/api/admin/matchTA',(req,res)=> {
     const { applicantJSON, coursesJSON } = req.body;  
     let userArray = [];
-
-    //check STD-13
-    let acceptedIndividuals = [];
-    let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
-    if(courseLocation[0] === undefined || courseLocation[1] === undefined) {
-        //excel file does not specify course codes and therefore we cannot process it
-        return res.end();
+    //SCHEMA: [Course Code, Applicant Name, Applicant Email, PrioScore, ApplicantScore, ProfScore, ProfRankScore, Hours]
+    for(let i = 1; i < applicantJSON.length; i++) {
+        userArray.push([applicantJSON[i][0], applicantJSON[i][1], applicantJSON[i][2], undefined, undefined, undefined, undefined, applicantJSON[i][4]]);
     }
-    for(let i of applicantJSON) {
-        for(let j of coursesJSON) {
-            if(j[courseLocation[1]] === i[courseLocation[0]]) {
-                acceptedIndividuals.push(i);
-                break;
-            }
-        }
-    }
-    //first row is headers
-    acceptedIndividuals.shift();
-    console.log(acceptedIndividuals);
+    console.log(userArray);
+
+    //CALCULATE SCORES
+
+    // //check STD-13
+    // let acceptedIndividuals = [];
+    // let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
+    // if(courseLocation[0] === undefined || courseLocation[1] === undefined) {
+    //     //excel file does not specify course codes and therefore we cannot process it
+    //     return res.end();
+    // }
+    // for(let i of applicantJSON) {
+    //     for(let j of coursesJSON) {
+    //         if(j[courseLocation[1]] === i[courseLocation[0]]) {
+    //             acceptedIndividuals.push(i);
+    //             break;
+    //         }
+    //     }
+    // }
+    // //first row is headers
+    // acceptedIndividuals.shift();
+    // console.log(acceptedIndividuals);
     
-    //check STD-14
-    let updatedArray = [];
-    [course, name, email, status, ta hours, score, profScore]
+    // //check STD-14
+    // let updatedArray = [];
+    // [course, name, email, status, ta hours, score, profScore]
 
     
 
 
 
-    //check STD-15
-    let firstPriority =[];
-    let secondPriority =[];
-    let thirdPriority = [];
+    // //check STD-15
+    // let firstPriority =[];
+    // let secondPriority =[];
+    // let thirdPriority = [];
     
-    for(let i of applicantJSON){
-        if(i[priorityLocation]==1)
-            firstPriority.push(i);
-        else if (i[priorityLocation]==2)
-            secondPriority.push(i);
-        else
-            thirdPriority.push(i);
-    }
+    // for(let i of applicantJSON){
+    //     if(i[priorityLocation]==1)
+    //         firstPriority.push(i);
+    //     else if (i[priorityLocation]==2)
+    //         secondPriority.push(i);
+    //     else
+    //         thirdPriority.push(i);
+    // }
 
     // let priorityLocation = findColumn(applicantJSON, 'Applicant status ( 1- Fundable, 2-NotFundable,3-External)');
     // for(let i of updatedArray) {
