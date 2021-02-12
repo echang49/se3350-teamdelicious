@@ -13,53 +13,135 @@ app.use(cors());
 
 app.use(express.static(path.join(__dirname, '/client/build')));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //ROUTES
 function findColumn(json, name) {
-    for(let i in json[0]) {
-        if(json[0][i] === name) {
+    for (let i in json[0]) {
+        if (json[0][i] === name) {
             return i;
         }
     }
     return undefined;
 }
 
-app.post('/api/admin/matchTA',(req,res)=> {
-    const { applicantJSON, coursesJSON } = req.body;  
+function distributeTAs(acceptedIndividuals, coursesJSON) {
+    let applications = [];
+
+    acceptedIndividuals.forEach(element => {
+
+
+        let questions = 0;
+        let yesCount = 0;
+        element.forEach(element => {
+
+            if (typeof element == 'string') {
+                if (element.includes('?')) {
+                    questions++;
+                } else if (element.includes('yes')) {
+                    yesCount++;
+                }
+            }
+        });
+
+        const application = {
+            course: element[0],
+            name: element[1],
+            email: element[2],
+            status: element[3],
+            hours: element[4],
+            preference: element[5],
+            qualificationFactor: yesCount / questions
+        }
+
+        applications.push(application);
+
+    });
+
+    //Sorts all applications by status and qualificationFactor (status takes priority)
+    applications = applications.sort((a, b) => {
+        let n = a.status - b.status;
+        if (n !== 0) {
+            return n
+        }
+        return b.qualificationFactor - a.qualificationFactor
+    })
+
+
+
+    //Holds objects including courseCode, hours needed, and TAs array
+    let courses = []
+    //CREATING COURSES OBJECTS IN COURSES ARRAY
+    for (i = 1; i < coursesJSON.length; i++) {
+        let course = {
+            courseCode: coursesJSON[i][0],
+            hoursToFill: 20,
+            TAs: []
+        }
+        courses.push(course);
+    }
+
+    console.log(applications);
+
+    //adding TAs to courses based off of previous sort
+    for (i = 0; i < applications.length; i++) {
+        let requestedCourse = applications[i].course;
+
+        let coursePosition;
+
+        for (i = 0; i < courses.length; i++) {
+            if (requestedCourse == courses[i].courseCode) {
+                coursePosition = i;
+                break;
+            }
+        }
+
+        if ((courses[coursePosition].hoursToFill - applications[i].hours) >= 0) {
+            confirmedTA = applications[i];
+            courses[coursePosition].TAs.push(confirmedTA.email)
+            applications = applications.filter(application => application.email != confirmedTA.email);
+        }
+    }
+}
+
+app.post('/api/admin/matchTA', (req, res) => {
+    const { applicantJSON, coursesJSON } = req.body;
     let userArray = [];
     //SCHEMA: [Course Code, Applicant Name, Applicant Email, PrioScore, ApplicantScore, ProfScore, ProfRankScore, Hours]
-    for(let i = 1; i < applicantJSON.length; i++) {
+    for (let i = 1; i < applicantJSON.length; i++) {
         userArray.push([applicantJSON[i][0], applicantJSON[i][1], applicantJSON[i][2], undefined, undefined, undefined, undefined, applicantJSON[i][4]]);
     }
-    console.log(userArray);
+    // console.log(userArray);
+
 
     //CALCULATE SCORES
 
-    // //check STD-13
-    // let acceptedIndividuals = [];
-    // let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
-    // if(courseLocation[0] === undefined || courseLocation[1] === undefined) {
-    //     //excel file does not specify course codes and therefore we cannot process it
-    //     return res.end();
-    // }
-    // for(let i of applicantJSON) {
-    //     for(let j of coursesJSON) {
-    //         if(j[courseLocation[1]] === i[courseLocation[0]]) {
-    //             acceptedIndividuals.push(i);
-    //             break;
-    //         }
-    //     }
-    // }
-    // //first row is headers
-    // acceptedIndividuals.shift();
-    // console.log(acceptedIndividuals);
-    
+    //check STD-13
+    let acceptedIndividuals = [];
+    let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
+    if (courseLocation[0] === undefined || courseLocation[1] === undefined) {
+        //excel file does not specify course codes and therefore we cannot process it
+        return res.end();
+    }
+    for (let i of applicantJSON) {
+        for (let j of coursesJSON) {
+            if (j[courseLocation[1]] === i[courseLocation[0]]) {
+                acceptedIndividuals.push(i);
+                break;
+            }
+        }
+    }
+    //first row is headers
+    acceptedIndividuals.shift();
+
+
+    console.log(distributeTAs(acceptedIndividuals, coursesJSON));
+
     // //check STD-14
     // let updatedArray = [];
     // [course, name, email, status, ta hours, score, profScore]
 
-    
+
 
 
 
@@ -67,7 +149,7 @@ app.post('/api/admin/matchTA',(req,res)=> {
     // let firstPriority =[];
     // let secondPriority =[];
     // let thirdPriority = [];
-    
+
     // for(let i of applicantJSON){
     //     if(i[priorityLocation]==1)
     //         firstPriority.push(i);
@@ -110,12 +192,12 @@ app.post('/api/admin/matchTA',(req,res)=> {
 })
 
 //function to 
-app.post('/api/admin/addCourse', (req,res)=>{
+app.post('/api/admin/addCourse', (req, res) => {
 
 })
 
-app.get('*', (req,res) =>{
-    res.sendFile(path.join(__dirname+'/client/build/index.html'));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
 
 app.listen(5000);
@@ -123,7 +205,7 @@ console.log('App is listening on port 5000');
 
 
 
-  
+
 
 
 
