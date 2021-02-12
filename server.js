@@ -81,9 +81,16 @@ function distributeTAs(acceptedIndividuals, coursesJSON) {
 app.post('/api/admin/matchTA', (req, res) => {
     const { applicantJSON, coursesJSON } = req.body;
 
+    //COLUMN LOCATIONS
+    let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
+    let emailLocation = findColumn(applicantJSON, 'applicant email');
+    let courseRankLocation = findColumn(applicantJSON, 'Course Rank');
+    let courseHoursLocation = findColumn(applicantJSON, '5or10 hrs');
+    let prioritizationLocation = findColumn(applicantJSON, 'Applicant status ( 1- Fundable, 2-NotFundable,3-External)');
+    let nameLocation = findColumn(applicantJSON, 'Applicant Name');
+
     // INPUT VALIDATION
     let acceptedIndividuals = [];
-    let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
     if (courseLocation[0] === undefined || courseLocation[1] === undefined) {
         //excel file does not specify course codes and therefore we cannot process it
         return res.end();
@@ -100,16 +107,14 @@ app.post('/api/admin/matchTA', (req, res) => {
     acceptedIndividuals.shift();
 
     let userArray = [];
-    //SCHEMA: [Course Code, Applicant Name, Applicant Email, PrioScore, ApplicantScore, ProfScore, ProfRankScore, Hours]
+    //SCHEMA: [Course Code, Applicant Name, Applicant Email, prioritization, ApplicantScore, ProfScore, ProfRankScore, Hours]
     for (let i in acceptedIndividuals) {
-        userArray.push([acceptedIndividuals[i][0], acceptedIndividuals[i][1], acceptedIndividuals[i][2], undefined, undefined, undefined, undefined, acceptedIndividuals[i][4]]);
+        userArray.push([acceptedIndividuals[i][courseLocation[0]], acceptedIndividuals[i][nameLocation], acceptedIndividuals[i][emailLocation], acceptedIndividuals[i][prioritizationLocation], undefined, undefined, undefined, acceptedIndividuals[i][courseHoursLocation]]);
     }
 
     //CALCULATE SCORES
     //STD-13
     let applicantScoreMap = new Map();
-    let emailLocation = findColumn(applicantJSON, 'applicant email');
-    let courseRankLocation = findColumn(applicantJSON, 'Course Rank');
     for(let i in acceptedIndividuals) {
         let mapResult = applicantScoreMap.get(acceptedIndividuals[i][emailLocation]);
         if(mapResult === undefined) {
