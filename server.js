@@ -28,35 +28,7 @@ function findColumn(json, name) {
 function distributeTAs(acceptedIndividuals, coursesJSON) {
     let applications = [];
 
-    acceptedIndividuals.forEach(element => {
 
-
-        let questions = 0;
-        let yesCount = 0;
-        element.forEach(element => {
-
-            if (typeof element == 'string') {
-                if (element.includes('?')) {
-                    questions++;
-                } else if (element.includes('yes')) {
-                    yesCount++;
-                }
-            }
-        });
-
-        const application = {
-            course: element[0],
-            name: element[1],
-            email: element[2],
-            status: element[3],
-            hours: element[4],
-            preference: element[5],
-            qualificationFactor: yesCount / questions
-        }
-
-        applications.push(application);
-
-    });
 
     //Sorts all applications by status and qualificationFactor (status takes priority)
     applications = applications.sort((a, b) => {
@@ -106,17 +78,8 @@ function distributeTAs(acceptedIndividuals, coursesJSON) {
 
 app.post('/api/admin/matchTA', (req, res) => {
     const { applicantJSON, coursesJSON } = req.body;
-    let userArray = [];
-    //SCHEMA: [Course Code, Applicant Name, Applicant Email, PrioScore, ApplicantScore, ProfScore, ProfRankScore, Hours]
-    for (let i = 1; i < applicantJSON.length; i++) {
-        userArray.push([applicantJSON[i][0], applicantJSON[i][1], applicantJSON[i][2], undefined, undefined, undefined, undefined, applicantJSON[i][4]]);
-    }
-    // console.log(userArray);
 
-
-    //CALCULATE SCORES
-
-    //check STD-13
+    // INPUT VALIDATION
     let acceptedIndividuals = [];
     let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
     if (courseLocation[0] === undefined || courseLocation[1] === undefined) {
@@ -134,8 +97,55 @@ app.post('/api/admin/matchTA', (req, res) => {
     //first row is headers
     acceptedIndividuals.shift();
 
+    let userArray = [];
+    //SCHEMA: [Course Code, Applicant Name, Applicant Email, PrioScore, ApplicantScore, ProfScore, ProfRankScore, Hours]
+    for (let i in acceptedIndividuals) {
+        userArray.push([acceptedIndividuals[i][0], acceptedIndividuals[i][1], acceptedIndividuals[i][2], undefined, undefined, undefined, undefined, acceptedIndividuals[i][4]]);
+    }
 
-    console.log(distributeTAs(acceptedIndividuals, coursesJSON));
+    //CALCULATE SCORES
+    //STD-13
+    let applicantScoreMap = new Map();
+    let emailLocation = findColumn(applicantJSON, 'applicant email');
+    let courseRankLocation = findColumn(applicantJSON, 'Course Rank');
+    for(let i in acceptedIndividuals) {
+        let mapResult = applicantScoreMap.get(acceptedIndividuals[i][emailLocation]);
+        if(mapResult === undefined) {
+            applicantScoreMap.set(acceptedIndividuals[i][emailLocation], 1);
+        }
+        else {
+            applicantScoreMap.set(acceptedIndividuals[i][emailLocation], mapResult + 1);
+        }
+    }
+    for(let i in acceptedIndividuals) {
+        let ranking = acceptedIndividuals[i][courseRankLocation];
+        let max = applicantScoreMap.get(acceptedIndividuals[i][emailLocation]);
+        userArray[i][4] = Math.round(((max - (ranking - 1))/max) * 100) / 100;
+    }
+
+    // //STD-14
+    for(let i in acceptedIndividuals) {
+        let questions = 0;
+        let yesCount = 0;
+        for(let j of acceptedIndividuals[i]) {
+            if (typeof j == 'string') {
+                if (j.includes('?')) {
+                    questions++;
+                } else if (j.includes('yes')) {
+                    yesCount++;
+                }
+            }
+        }
+        userArray[i][5] = yesCount / questions;
+    }
+    console.log(userArray);
+
+
+
+
+
+
+    //console.log(distributeTAs(acceptedIndividuals, coursesJSON));
 
     // //check STD-14
     // let updatedArray = [];
