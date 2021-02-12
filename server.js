@@ -27,6 +27,7 @@ function findColumn(json, name) {
 
 app.post('/api/admin/matchTA',(req,res)=> {
     const { applicantJSON, coursesJSON } = req.body;  
+    let userArray = [];
 
     //check STD-13
     let acceptedIndividuals = [];
@@ -48,12 +49,42 @@ app.post('/api/admin/matchTA',(req,res)=> {
     console.log(acceptedIndividuals);
     
     //check STD-14
+    let updatedArray = [];
+    [course, name, email, status, ta hours, score, profScore]
+
     
 
+
+
     //check STD-15
-    let priorityLocation = [findColumn(applicantJSON, 'Applicant status ( 1- Fundable, 2-NotFundable,3-External)')];
+    let firstPriority =[];
+    let secondPriority =[];
+    let thirdPriority = [];
     
-    //check STD-16
+    for(let i of applicantJSON){
+        if(i[priorityLocation]==1)
+            firstPriority.push(i);
+        else if (i[priorityLocation]==2)
+            secondPriority.push(i);
+        else
+            thirdPriority.push(i);
+    }
+
+    // let priorityLocation = findColumn(applicantJSON, 'Applicant status ( 1- Fundable, 2-NotFundable,3-External)');
+    // for(let i of updatedArray) {
+    //     if(i[priorityLocation] === 1) {
+    //         continue;
+    //     }
+    //     else if(i[priorityLocation] === 2) {
+    //         i[priorityLocation] = 0.67;
+    //     }
+    //     else {
+    //         i[priorityLocation] = 0.33;
+    //     }
+    // }
+
+    //RANKING ALGORITHM
+
     res.end();
 
     /*
