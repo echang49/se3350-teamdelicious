@@ -24,8 +24,10 @@ function MatchingTA() {
                 coursesJSON: coursesJSON
             };
             axios.post('/api/admin/matchTA', data)
-                .then(() => {
+                .then((res) => {
+                    let result = JSON.stringify(res.data);
                     alert("Success!");
+                    alert(result); 
                 })
                 .catch((err) => {
                     alert("Failure. :(")

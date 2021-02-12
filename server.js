@@ -140,10 +140,7 @@ app.post('/api/admin/matchTA', (req, res) => {
         }
     }
 
-    console.log(courses);
-
-
-    res.end();
+    res.send(courses);
 })
 
 //function to 
