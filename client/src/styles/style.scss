@@ -1,8 +1,18 @@
 //COMPOSITION
 body {
     font-family: 'Roboto', sans-serif;
+    font-size: 20px;
     min-height: 100vh;
     margin: 0;
+    background-color: #5b6993;
+}
+
+button {
+    font-size: 20px;
+}
+
+input {
+    font-size: 20px;
 }
 
 //UTILITY
@@ -28,9 +38,10 @@ body {
             border-radius: 3px;
             border-top-left-radius:15px;
             border-bottom-right-radius:15px;
+            padding: 50px 100px;
             filter: drop-shadow(5px 3px 7px hsl(0,0,20));
             .title {
-                font-size: 20px;
+                font-size: 40px;
             }
             .upload {
                 display: flex;
@@ -41,7 +52,6 @@ body {
                 margin-top: 10px;
             }
         }
-        
     }
 
 //EXCEPTIONS

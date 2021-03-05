@@ -1,7 +1,17 @@
 body {
   font-family: 'Roboto', sans-serif;
+  font-size: 20px;
   min-height: 100vh;
   margin: 0;
+  background-color: #5b6993;
+}
+
+button {
+  font-size: 20px;
+}
+
+input {
+  font-size: 20px;
 }
 
 .box {
@@ -40,12 +50,13 @@ body {
   border-radius: 3px;
   border-top-left-radius: 15px;
   border-bottom-right-radius: 15px;
+  padding: 50px 100px;
   -webkit-filter: drop-shadow(5px 3px 7px #333333);
           filter: drop-shadow(5px 3px 7px #333333);
 }
 
 .matchTA .box .title {
-  font-size: 20px;
+  font-size: 40px;
 }
 
 .matchTA .box .upload {

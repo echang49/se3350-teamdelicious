@@ -153,39 +153,3 @@ app.get('*', (req, res) => {
 });
 
 app.listen(5000);
-console.log('App is listening on port 5000');
-
-
-
-
-
-
-
-//console.log(distributeTAs(acceptedIndividuals, coursesJSON));
-
-    // //check STD-15
-    // let firstPriority =[];
-    // let secondPriority =[];
-    // let thirdPriority = [];
-
-    // for(let i of applicantJSON){
-    //     if(i[priorityLocation]==1)
-    //         firstPriority.push(i);
-    //     else if (i[priorityLocation]==2)
-    //         secondPriority.push(i);
-    //     else
-    //         thirdPriority.push(i);
-    // }
-
-    // let priorityLocation = findColumn(applicantJSON, 'Applicant status ( 1- Fundable, 2-NotFundable,3-External)');
-    // for(let i of updatedArray) {
-    //     if(i[priorityLocation] === 1) {
-    //         continue;
-    //     }
-    //     else if(i[priorityLocation] === 2) {
-    //         i[priorityLocation] = 0.67;
-    //     }
-    //     else {
-    //         i[priorityLocation] = 0.33;
-    //     }
-    // }
