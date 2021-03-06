@@ -13,6 +13,7 @@ button {
 
 input {
     font-size: 20px;
+    padding: 5px;
 }
 
 //UTILITY
@@ -27,6 +28,10 @@ input {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .show {
+        display: inline-block!important;
     }
 
 //BLOCKS
@@ -50,6 +55,12 @@ input {
             }
             button {
                 margin-top: 10px;
+            }
+            .error {
+                font-size: 15px;
+                margin: 5px 0 0 0;
+                display: none;
+                color: red;
             }
         }
     }

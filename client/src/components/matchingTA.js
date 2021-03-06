@@ -26,7 +26,6 @@ function MatchingTA() {
             axios.post('/api/admin/matchTA', data)
                 .then((res) => {
                     let result = JSON.stringify(res.data);
-                    alert("Success!");
                     alert(result); 
                 })
                 .catch((err) => {
