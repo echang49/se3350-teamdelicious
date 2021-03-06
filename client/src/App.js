@@ -1,9 +1,11 @@
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
-import AddCourses from "./components/addCourses";
-import AddDescriptions from "./components/addDescriptions";
+import AddCourses from "./components/adminCourses";
+import AddDescriptions from "./components/profDescriptions";
 import Login from "./components/login";
-import Register from "./components/register";
-import MatchingTA from "./components/matchingTA";
+import Register from "./components/adminRegister";
+import MatchingTA from "./components/adminMatching";
+import ProfDashboard from "./components/profDashboard";
+import AdminDashboard from "./components/adminDashboard";
 
 function App() {
 
@@ -11,6 +13,9 @@ function App() {
     <div>
       <Router>
         <Switch> 
+          <Route path="/admin/dashboard">
+            <AdminDashboard />
+          </Route>
           <Route path="/admin/register">
             <Register />
           </Route>
@@ -19,6 +24,9 @@ function App() {
           </Route>
           <Route path="/admin/matchTA">
             <MatchingTA />
+          </Route>
+          <Route path ="/prof/dashboard">
+            <ProfDashboard />
           </Route>
           <Route path="/prof/descriptions">
             <AddDescriptions />
