@@ -1,4 +1,5 @@
 import "../styles/style.css";
+import AdminNav from "./adminNav";
 import { useState } from "react";
 import readXlsxFile from "read-excel-file";
 import axios from "axios";
@@ -47,19 +48,22 @@ function MatchingTA() {
     }
 
     return (
-        <div className="matchTA">
-            <div className="box">
-                <p className="title"><strong>Matching TA Page</strong></p>
-                <div className="upload">
-                    <label htmlFor="courseList">Upload the Course List:</label>
-                    <input onChange={(event) => handleChange(1, event.target.files[0])} id="courseList" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-                </div>
-                <div className="upload">
-                    <label htmlFor="applicantList">Upload the Applicant List:</label>
-                    <input onChange={(event) => handleChange(2, event.target.files[0])} id="applicantList" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-                </div>
-                <div>
-                    <button onClick={() => handleSubmit()}>Submit</button> 
+        <div>
+            <AdminNav />
+            <div className="matchTA">
+                <div className="box">
+                    <p className="title"><strong>Matching TA Page</strong></p>
+                    <div className="upload">
+                        <label htmlFor="courseList">Upload the Course List:</label>
+                        <input onChange={(event) => handleChange(1, event.target.files[0])} id="courseList" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                    </div>
+                    <div className="upload">
+                        <label htmlFor="applicantList">Upload the Applicant List:</label>
+                        <input onChange={(event) => handleChange(2, event.target.files[0])} id="applicantList" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                    </div>
+                    <div>
+                        <button onClick={() => handleSubmit()}>Submit</button> 
+                    </div>
                 </div>
             </div>
         </div>

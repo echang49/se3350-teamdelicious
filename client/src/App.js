@@ -4,18 +4,13 @@ import AddDescriptions from "./components/profDescriptions";
 import Login from "./components/login";
 import Register from "./components/adminRegister";
 import MatchingTA from "./components/adminMatching";
-import ProfDashboard from "./components/profDashboard";
-import AdminDashboard from "./components/adminDashboard";
 
 function App() {
-
+  
   return (
     <div>
       <Router>
         <Switch> 
-          <Route path="/admin/dashboard">
-            <AdminDashboard />
-          </Route>
           <Route path="/admin/register">
             <Register />
           </Route>
@@ -24,9 +19,6 @@ function App() {
           </Route>
           <Route path="/admin/matchTA">
             <MatchingTA />
-          </Route>
-          <Route path ="/prof/dashboard">
-            <ProfDashboard />
           </Route>
           <Route path="/prof/descriptions">
             <AddDescriptions />

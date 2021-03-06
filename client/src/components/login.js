@@ -35,9 +35,9 @@ function AddDescriptions() {
         {
           loginState[0] ?
             loginState[1] ?
-            <Redirect to="/admin/dashboard" />
+            <Redirect to="/admin/matchTA" />
             :
-            <Redirect to="/prof/dashboard" />
+            <Redirect to="/prof/descriptions" />
           :
           <div className="center matchTA">
             <div className="box">

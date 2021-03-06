@@ -143,6 +143,24 @@ app.post('/api/admin/matchTA', (req, res) => {
     res.send(courses);
 })
 
+app.post('/api/admin/createUser', (req, res) => {
+    let { email, password } = req.body;
+    admin.auth().createUser({
+        email: email,
+        emailVerified: false,
+        password: password,
+        disabled: false,
+      })
+      .then((userRecord) => {
+        console.log('Successfully created new user:', userRecord.uid);
+        return res.send("Account successfully created!");
+      })
+      .catch((error) => {
+        console.log('Error creating new user:', error);
+        return res.send("Server error encountered.");
+      });
+})
+
 //function to 
 app.post('/api/admin/addCourse', (req, res) => {
 

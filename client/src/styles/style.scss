@@ -34,6 +34,28 @@ input {
         display: inline-block!important;
     }
 
+    .navbar {
+        background-color: #FFF;
+        padding: 20px 50px;
+        display: flex;
+        justify-content: space-between;
+        .nav-body {
+            display: flex;
+            p {
+                a {
+                    all: unset;
+                    padding: 0 15px;
+                    color: #000;
+                }
+                &:hover {
+                    font-weight: 700;
+                    cursor: pointer;
+                }
+            }
+            
+        }
+    }
+
 //BLOCKS
     .matchTA {
         position: absolute;
@@ -64,5 +86,26 @@ input {
             }
         }
     }
+    
+    .dashboard {
+        padding: 0 10vw;
+        .dash-button {
+            background-color: #0C2D48;
+            font-size: 5vh;
+            font-weight: bold;
+            text-align: center;
+            color: #ddd;
+            //width: 50%;
+            height: 20vh;
+            -webkit-transition: 0.2s;
+            transition: 0.2s;
+            &:hover {
+                background-color: #5b6993;
+                font-size: 5.5vh;
+                cursor: pointer;
+            }
+        }
+    }
+
 
 //EXCEPTIONS

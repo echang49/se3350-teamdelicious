@@ -43,6 +43,34 @@ input {
   display: inline-block !important;
 }
 
+.navbar {
+  background-color: #FFF;
+  padding: 20px 50px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.navbar .nav-body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.navbar .nav-body p a {
+  all: unset;
+  padding: 0 15px;
+  color: #000;
+}
+
+.navbar .nav-body p:hover {
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .matchTA {
   position: absolute;
   top: 50%;
@@ -84,5 +112,26 @@ input {
   margin: 5px 0 0 0;
   display: none;
   color: red;
+}
+
+.dashboard {
+  padding: 0 10vw;
+}
+
+.dashboard .dash-button {
+  background-color: #0C2D48;
+  font-size: 5vh;
+  font-weight: bold;
+  text-align: center;
+  color: #ddd;
+  height: 20vh;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+}
+
+.dashboard .dash-button:hover {
+  background-color: #5b6993;
+  font-size: 5.5vh;
+  cursor: pointer;
 }
 /*# sourceMappingURL=style.css.map */
