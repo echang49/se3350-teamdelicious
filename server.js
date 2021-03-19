@@ -8,13 +8,14 @@ var cors = require('cors');
 const { admin, firestore, auth } = require("./firebase")
 const multer = require('multer');
 var upload = multer();
+const fs = require('fs');
 
-const {Storage} = require ('@google-cloud/storage');
-const { DownloaderHelper } = require('node-downloader-helper')
-const storage = new Storage({
-    keyFilename: './serviceAccountKey.json',
-});
+//const {Storage} = require ('@google-cloud/storage');
+const { DownloaderHelper } = require('node-downloader-helper');
+const fileUpload = require('express-fileupload');
 
+const json2xls = require ('json2xls');
+const { fstat } = require('fs');
 let bucketName = 'gs://ta-course-matching-app.appspot.com';
 
 const app = express();
@@ -174,11 +175,22 @@ app.post('/api/admin/createUser', (req, res) => {
       });
 })
 
-app.post('/api/admin/sendApplicants', upload.single('excel'), async (req,res)=>{
+/*app.post('/api/admin/sendApplicants', upload.single('excel'), async (req,res)=>{
     let { file } = req.body;
     console.log(req.file);
     console.log(req.body);
     await storage.bucket(bucketName).upload(req.file);
+    res.end();
+})*/
+
+app.post('/api/admin/sendApplicants', async (req,res)=>{
+    const {applicantJSON} = req.body;
+    console.log(applicantJSON);
+
+    var xls = json2xls(applicantJSON);
+
+    fs.writeFileSync('data.xlsx',xls,'binary');
+
     res.end();
 })
 
@@ -188,7 +200,7 @@ app.get('/api/professor/getInfo',(req, res) => {
     //const fileName = path.basename(url); 
     //const fileStream = fs.createWriteStream(fileName);
     //res.pipe(fileStream);
-    const downloader = new DownloaderHelper("gs://ta-course-matching-app.appspot.com");
+    const downloader = new DownloaderHelper("./data.xlsx");
     downloader.on('end',()=> console.log("Download Completed"))
     downloader.start();
     
