@@ -22,15 +22,13 @@ function AddCourses() {
     .then((res) => {
       console.log(res.data);
       alert("DONE");
-      ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-      //DANIELLE PUT LOGIC HERE
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      
       var courseData = res.data; //array of JSON object
       var csvRows = [];
 
       //get headers
       const headers = Object.keys(courseData[0]);
-      csvRows.push(headers.join(','));
+      csvRows.push(headers.join(';'));
       console.log(csvRows);
 
       //loop over rows
@@ -40,13 +38,13 @@ function AddCourses() {
           console.log("item  " + fieldValue)
           return row[header];
         })
-        csvRows.push(values.join(','));
+        csvRows.push(values.join(';'));
       }
       var csvData = csvRows.join('\n');
       console.log(csvData);
 
       //download as csv
-      const blob = new Blob([csvData], { type: 'text/csv'});
+      const blob = new Blob(["SEP=;\n" + csvData], { type: 'text/csv'});
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.setAttribute('hidden','');

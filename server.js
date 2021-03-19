@@ -242,7 +242,6 @@ app.post('/api/professor/addDescription', async (req,res) =>{
 //get course data
 app.get('/api/admin/getCourseData', async (req, res) => {
 
-    console.log("hello");
     let data = [];
 
     //get all docs in collection
@@ -253,9 +252,7 @@ app.get('/api/admin/getCourseData', async (req, res) => {
     }
 
     snapshot.forEach(doc => {
-        console.log(doc.id, '=>', doc.data());
         data.push(doc.data()); //store data in array
-        console.log(data);
     });
 
     res.send(data);
