@@ -26,21 +26,34 @@ function AddCourses() {
       //DANIELLE PUT LOGIC HERE
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////
       var courseData = res.data; //array of JSON object
-      
-      var array = typeof courseData != 'object' ? JSON.parse(courseData) : courseData;
-      var str = '';
+      var csvRows = [];
 
-      for (var i = 0; i < array.length; i++) {
-        var line = '';
-        for (var index in array[i]){
-          if (line != '') line += ","
-          line += array[i][index];
-        }
+      //get headers
+      const headers = Object.keys(courseData[0]);
+      csvRows.push(headers.join(','));
+      console.log(csvRows);
 
-        str += line + '\r\n';
+      //loop over rows
+      for (const row of courseData){
+        const values = headers.map(header => {
+          const fieldValue = row[header];
+          console.log("item  " + fieldValue)
+          return row[header];
+        })
+        csvRows.push(values.join(','));
+      }
+      var csvData = csvRows.join('\n');
+      console.log(csvData);
 
-      };
-      return str;
+      //download as csv
+      const blob = new Blob([csvData], { type: 'text/csv'});
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('hidden','');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'coursesInformation.csv');
+      a.click();
+
     })
     .catch((err) => {
       alert(err);
