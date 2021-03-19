@@ -71,6 +71,16 @@ input {
   cursor: pointer;
 }
 
+.flex-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
 .matchTA {
   position: absolute;
   top: 50%;

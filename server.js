@@ -6,14 +6,22 @@ const path = require('path');
 const bodyParser = require('body-parser');
 var cors = require('cors');
 const { admin, firestore, auth } = require("./firebase")
+const multer = require('multer');
+var upload = multer();
+
+const {Storage} = require ('@google-cloud/storage');
+const { DownloaderHelper } = require('node-downloader-helper')
 
 const app = express();
+const coursesRef = firestore.collection('courses')
+
 
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, '/client/build')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(upload.array());
 
 //ROUTES
 function findColumn(json, name) {
@@ -161,12 +169,81 @@ app.post('/api/admin/createUser', (req, res) => {
       });
 })
 
-//function to 
-app.post('/api/admin/addCourse', (req, res) => {
-
+app.post('/api/admin/sendApplicants', upload.single('excel'), (req,res)=>{
+    let { file } = req.body;
+    console.log(req.file);
+    console.log(req.body);
+    res.end();
 })
 
-app.get('*', (req, res) => {
+//downloads the file containing all the information of the applicants
+app.get('/api/professor/getInfo',(req, res) => {
+    //const url = ".xlsx";
+    //const fileName = path.basename(url); 
+    //const fileStream = fs.createWriteStream(fileName);
+    //res.pipe(fileStream);
+    const downloader = new DownloaderHelper("gs://ta-course-matching-app.appspot.com");
+    downloader.on('end',()=> console.log("Download Completed"))
+    downloader.start();
+    
+})
+
+
+app.post('/api/admin/addCourse', (req, res) => {
+    let {courseCode, professor}  = req.body;
+    coursesRef.doc(courseCode).set(
+        {courseCode: courseCode, professor: professor, description: "", questions:""},
+        {merge: true})
+    res.end();
+})
+
+app.post('/api/professor/addDescription', async (req,res) =>{
+    let { professor, courseCode, description, questions } = req.body; //questions = []
+
+    const courseRef = coursesRef.doc(courseCode);
+
+    const doc = await courseRef.get();
+
+    console.log(doc.data().professor);
+
+
+    if(doc.data().professor == professor){
+        if(courseRef != null){ 
+            courseRef.set({questions: questions, description: description}, {merge:true})
+        } else { 
+            console.log("course does not exist");
+        }
+       
+    } else {
+        console.log("Professor does not exist");
+    
+    }
+    res.end();
+})
+
+//get course data
+app.get('/api/admin/getCourseData', async (req, res) => {
+
+    console.log("hello");
+    let data = [];
+
+    //get all docs in collection
+    const snapshot = await coursesRef.get();
+    if (snapshot.empty) {
+        console.log('No matching documents.');
+        res.end();
+    }
+
+    snapshot.forEach(doc => {
+        console.log(doc.id, '=>', doc.data());
+        data.push(doc.data()); //store data in array
+        console.log(data);
+    });
+
+    res.send(data);
+})
+
+app.get('', (req, res) => {
     res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
 

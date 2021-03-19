@@ -4,6 +4,7 @@ import AddDescriptions from "./components/profDescriptions";
 import Login from "./components/login";
 import Register from "./components/adminRegister";
 import MatchingTA from "./components/adminMatching";
+import AdminInfo from "./components/adminInfo";
 
 function App() {
   
@@ -19,6 +20,9 @@ function App() {
           </Route>
           <Route path="/admin/matchTA">
             <MatchingTA />
+          </Route>
+          <Route path = "/admin/uploadInfo">
+            <AdminInfo />
           </Route>
           <Route path="/prof/descriptions">
             <AddDescriptions />

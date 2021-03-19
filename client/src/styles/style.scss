@@ -56,6 +56,14 @@ input {
         }
     }
 
+    .flex-row {
+        display: flex;
+    }
+
+    .mr-10 {
+        margin-right: 10px;
+    }
+
 //BLOCKS
     .matchTA {
         position: absolute;
