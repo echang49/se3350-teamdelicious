@@ -52,7 +52,6 @@ input {
                     cursor: pointer;
                 }
             }
-            
         }
     }
 
@@ -64,12 +63,18 @@ input {
         margin-right: 10px;
     }
 
+    .pl-50 {
+        padding-left: 50px;
+    }
+
 //BLOCKS
     .matchTA {
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%,-50%);
         .box {
+            max-height: 55vh!important;
+            overflow-y: scroll;
             border-radius: 3px;
             border-top-left-radius:15px;
             border-bottom-right-radius:15px;
@@ -91,6 +96,12 @@ input {
                 margin: 5px 0 0 0;
                 display: none;
                 color: red;
+            }
+            .result {
+                p {
+                    margin: 3px 0;
+                }
+                margin: 20px 0;
             }
         }
     }
@@ -117,3 +128,4 @@ input {
 
 
 //EXCEPTIONS
+//accordion 
