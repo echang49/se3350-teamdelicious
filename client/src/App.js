@@ -5,6 +5,7 @@ import Login from "./components/login";
 import Register from "./components/adminRegister";
 import MatchingTA from "./components/adminMatching";
 import AdminInfo from "./components/adminInfo";
+import ProfInfo from  "./components/profInfo";
 
 function App() {
   
@@ -26,6 +27,9 @@ function App() {
           </Route>
           <Route path="/prof/descriptions">
             <AddDescriptions />
+          </Route>
+          <Route path="/prof/rank">
+            <ProfInfo />
           </Route>
           <Route path="/">
             <Login />

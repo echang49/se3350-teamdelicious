@@ -25,6 +25,7 @@ function ProfNav() {
                     <p>Engineering TA's</p>
                     <div className ="nav-body">
                         <p><Link to="/prof/descriptions">Add Descriptions</Link></p>
+                        <p><Link to="/prof/rank">Rank TA's</Link></p>
                         <p onClick={() => signOut()}>Sign Out</p>
                     </div>
                 </div>

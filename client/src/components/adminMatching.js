@@ -29,12 +29,12 @@ function MatchingTA() {
             axios.post('/api/admin/matchTA', data)
                 .then((res) => {
                     let result = res.data;
-                    console.log(result);
-                    setBool(false);
                     setData(result);
+                    setBool(false);
                 })
                 .catch((err) => {
-                    alert("Failure. :(")
+                    alert("Failure. :(");
+                    console.log(err);
                 });
         }
         else {
@@ -49,6 +49,14 @@ function MatchingTA() {
         else {
             setApplicantList(file);
         }
+    }
+
+    function handleDownload() {
+
+    }
+
+    function handleUpload() {
+
     }
 
     return (
@@ -70,6 +78,9 @@ function MatchingTA() {
                             <div>
                                 <button onClick={() => handleSubmit()}>Submit</button> 
                             </div>
+                            <p className="title"><strong>Results</strong></p>
+                            <button onClick={() => handleDownload()}>Download</button> 
+                            <button onClick={() => handleUpload()}>Upload Changes</button> 
                         </div>
                     </div>
                 :
@@ -84,7 +95,7 @@ function MatchingTA() {
                                     <p>TA's: </p>
                                     {
                                         item.TAs.map((ta) => (
-                                            <p className="pl-50">{ta}</p>
+                                            <p className="pl-50">{ta[0]} HOURS: {ta[1]}</p>
                                         ))
                                     }
                                 </div>

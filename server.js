@@ -9,9 +9,10 @@ const { admin, firestore, auth } = require("./firebase")
 const multer = require('multer');
 var upload = multer();
 const fs = require('fs');
+const Downloader = require('nodejs-file-downloader');
 
 //const {Storage} = require ('@google-cloud/storage');
-const { DownloaderHelper } = require('node-downloader-helper');
+//const { DownloaderHelper } = require('node-downloader-helper');
 const fileUpload = require('express-fileupload');
 
 const json2xls = require ('json2xls');
@@ -45,6 +46,7 @@ app.post('/api/admin/matchTA', (req, res) => {
     //COLUMN LOCATIONS
     let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
     let emailLocation = findColumn(applicantJSON, 'applicant email');
+    let professorLocation = findColumn(applicantJSON, 'Professor Rank');
     let courseRankLocation = findColumn(applicantJSON, 'Course Rank');
     let courseHoursLocation = findColumn(applicantJSON, '5or10 hrs');
     let prioritizationLocation = findColumn(applicantJSON, 'Applicant status ( 1- Fundable, 2-NotFundable,3-External)');
@@ -92,25 +94,26 @@ app.post('/api/admin/matchTA', (req, res) => {
     }
 
     //STD-14
+    let professorScoreMap = new Map();
     for(let i in acceptedIndividuals) {
-        let questions = 0;
-        let yesCount = 0;
-        for(let j of acceptedIndividuals[i]) {
-            if (typeof j == 'string') {
-                if (j.includes('?')) {
-                    questions++;
-                } else if (j.includes('yes')) {
-                    yesCount++;
-                }
-            }
+        let mapResult = professorScoreMap.get(acceptedIndividuals[i][courseLocation]);
+        if(mapResult === undefined) {
+            professorScoreMap.set(acceptedIndividuals[i][courseLocation], 1);
         }
-        userArray[i][5] = yesCount / questions;
+        else {
+            professorScoreMap.set(acceptedIndividuals[i][courseLocation], mapResult + 1);
+        }
+    }
+    for(let i in acceptedIndividuals) {
+        let ranking = acceptedIndividuals[i][professorLocation]; //grab prof applicant ranking
+        let max = applicantScoreMap.get(acceptedIndividuals[i][courseLocation]);
+        userArray[i][4] = Math.round(((max - (ranking - 1))/max) * 100) / 100;
     }
 
     //RANKING ALGORITHM
     for(let i of userArray) {
-        //FORMULA: ApplicantScore*0.7 + ProfScore*0.3 + ProfRankScore*0;
-        i[8] = i[4]*0.7 + i[5]*0.3 + 0;
+        //FORMULA: ApplicantScore*0.7 + ProfScore*0.3;
+        i[8] = i[4]*0.7 + i[5]*0.3;
     }
 
     //STD-15
@@ -130,6 +133,7 @@ app.post('/api/admin/matchTA', (req, res) => {
         let course = {
             courseCode: coursesJSON[i][0],
             hoursToFill: 20,
+            hoursFilled: 0,
             TAs: []
         }
         courses.push(course);
@@ -137,24 +141,43 @@ app.post('/api/admin/matchTA', (req, res) => {
 
     // //adding TAs to courses based off of previous sort
     while(userArray.length > 0) {
-        let requestedCourse = userArray[0][0];
-        let coursePosition;
+        for(let ta of userArray) {
+            let requestedCourse = ta[0];
+            let coursePosition;
 
-        for (i = 0; i < courses.length; i++) {
-            if (requestedCourse == courses[i].courseCode) {
-                coursePosition = i;
+            for (i = 0; i < courses.length; i++) {
+                if (requestedCourse == courses[i].courseCode) {
+                    coursePosition = i;
+                    break;
+                }
+            }
+
+            if ((courses[coursePosition].hoursToFill - (courses[coursePosition].hoursFilled + ta[7])) >= 0) {
+                courses[coursePosition].hoursFilled = courses[coursePosition].hoursFilled + ta[7];
+                courses[coursePosition].TAs.push([ta[2], ta[7]])
+                userArray = userArray.filter(user => user[2] !== ta[2]);
                 break;
             }
-        }
-
-        if ((courses[coursePosition].hoursToFill - userArray[0][7]) >= 0) {
-            confirmedTA = userArray[0];
-            courses[coursePosition].TAs.push(confirmedTA[2])
-            userArray = userArray.filter(user => user[2] !== confirmedTA[2]);
+            else {
+                continue;
+            }
         }
     }
 
     res.send(courses);
+
+    //Turn Courses into parsable csv
+    let results = [["Course Code", "Hours to Fill", "TAs (TA then Hour)"]];
+    for(let course of courses) {
+        let temp = [course.courseCode, course.hoursToFill];
+        for(let TAs of course.TAs) {
+            temp.push(TAs[0]);
+            temp.push(TAs[1]);
+        }
+        results.push(temp);
+    }
+    var xls = json2xls(results);
+    fs.writeFileSync('results.xlsx',xls,'binary');
 })
 
 app.post('/api/admin/createUser', (req, res) => {
@@ -175,24 +198,48 @@ app.post('/api/admin/createUser', (req, res) => {
       });
 })
 
-/*app.post('/api/admin/sendApplicants', upload.single('excel'), async (req,res)=>{
-    let { file } = req.body;
-    console.log(req.file);
-    console.log(req.body);
-    await storage.bucket(bucketName).upload(req.file);
-    res.end();
-})*/
-
+//upload spreadsheet of applicants
 app.post('/api/admin/sendApplicants', async (req,res)=>{
     const {applicantJSON} = req.body;
+    //console.log("hello");
     console.log(applicantJSON);
 
+    //keep this because we need this
     var xls = json2xls(applicantJSON);
 
     fs.writeFileSync('data.xlsx',xls,'binary');
 
+    //with applicantJSON, delete the rows that have Q,A, etc... and column "Professor Rank"
+    console.log(applicantJSON[1]);
+
+    /*for(let i of applicantJSON) {
+        for(let j of applicantJSON[i]){
+         if (typeof j == 'string') {
+                if (j.includes('?')) {
+                   delete applicantJSON[i][j];
+                   delete applicantJSON[i][j+1];
+                }
+            }
+        }
+    }*/
+
+    //add column to the end that says professor rank
+    //var xls2 = json2xls(applicantJSON);
+    //fs.writeFileSync('rankings.xlsx',xls2,'binary');
+
+
     res.end();
 })
+
+//update applicant spreadsheet with prof rankings 
+app.post('/api/professor/sendRankings', async (req, res) => {
+    const {applicantJSON} = req.body;
+
+    var xls = json2xls(applicantJSON);
+    fs.writeFileSync('ranking.xlsx',xls,'binary');
+
+    res.end();
+});
 
 //downloads the file containing all the information of the applicants
 app.get('/api/professor/getInfo',(req, res) => {
@@ -200,11 +247,12 @@ app.get('/api/professor/getInfo',(req, res) => {
     //const fileName = path.basename(url); 
     //const fileStream = fs.createWriteStream(fileName);
     //res.pipe(fileStream);
-    const downloader = new DownloaderHelper("./data.xlsx");
+    /*const downloader = new DownloaderHelper('./data.xlsx', './information');
     downloader.on('end',()=> console.log("Download Completed"))
-    downloader.start();
-    
-})
+    downloader.start();*/
+    console.log("ok");
+res.download(__dirname+'/information/data.xlsx');  
+});
 
 
 app.post('/api/admin/addCourse', (req, res) => {
@@ -239,27 +287,31 @@ app.post('/api/professor/addDescription', async (req,res) =>{
     res.end();
 })
 
-//get course data
+//get course data from database
 app.get('/api/admin/getCourseData', async (req, res) => {
 
     let data = [];
-
     //get all docs in collection
     const snapshot = await coursesRef.get();
     if (snapshot.empty) {
         console.log('No matching documents.');
         res.end();
     }
-
     snapshot.forEach(doc => {
         data.push(doc.data()); //store data in array
     });
-
-    res.send(data);
+    res.send(data); //send array of course data
 })
 
 app.get('', (req, res) => {
     res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
+
+//Pseudo code to calculate hours
+app.get( () => {
+
+
+    
+}) 
 
 app.listen(5000);
