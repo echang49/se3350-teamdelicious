@@ -177,6 +177,10 @@ app.post('/api/admin/matchTA', (req, res) => {
     fs.writeFileSync('./information/results.csv',csv,'binary');
 })
 
+app.get('/api/admin/downloadResults', (req, res) => {
+    res.download(path.join(__dirname, '/information/results.csv'));
+})
+
 app.post('/api/admin/createUser', (req, res) => {
     let { email, password } = req.body;
     admin.auth().createUser({

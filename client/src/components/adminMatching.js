@@ -2,6 +2,7 @@ import "../styles/style.css";
 import AdminNav from "./adminNav";
 import { useState } from "react";
 import readXlsxFile from "read-excel-file";
+import fileDownload from "js-file-download";
 import axios from "axios";
 
 function MatchingTA() {
@@ -52,7 +53,13 @@ function MatchingTA() {
     }
 
     function handleDownload() {
-
+        axios.get('/api/admin/downloadResults')
+        .then((res) => {
+            fileDownload(res.data, 'results.csv');
+        })
+        .catch((err) => {
+            console.log(err);
+        });
     }
 
     function handleUpload() {
