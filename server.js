@@ -11,11 +11,7 @@ var upload = multer();
 const fs = require('fs');
 const Downloader = require('nodejs-file-downloader');
 
-//const {Storage} = require ('@google-cloud/storage');
-//const { DownloaderHelper } = require('node-downloader-helper');
-const fileUpload = require('express-fileupload');
-
-const json2xls = require ('json2xls');
+const { parse } = require ('json2csv');
 const { fstat } = require('fs');
 let bucketName = 'gs://ta-course-matching-app.appspot.com';
 
@@ -176,8 +172,9 @@ app.post('/api/admin/matchTA', (req, res) => {
         }
         results.push(temp);
     }
-    var xls = json2xls(results);
-    fs.writeFileSync('results.xlsx',xls,'binary');
+
+    const csv = parse(results);
+    fs.writeFileSync('./information/results.csv',csv,'binary');
 })
 
 app.post('/api/admin/createUser', (req, res) => {
@@ -205,9 +202,8 @@ app.post('/api/admin/sendApplicants', async (req,res)=>{
     console.log(applicantJSON);
 
     //keep this because we need this
-    var xls = json2xls(applicantJSON);
-
-    fs.writeFileSync('data.xlsx',xls,'binary');
+    const csv = parse(applicantJSON);
+    fs.writeFileSync('./information/data.csv',csv,'binary');
 
     //with applicantJSON, delete the rows that have Q,A, etc... and column "Professor Rank"
     console.log(applicantJSON[1]);
@@ -235,24 +231,25 @@ app.post('/api/admin/sendApplicants', async (req,res)=>{
 app.post('/api/professor/sendRankings', async (req, res) => {
     const {applicantJSON} = req.body;
 
-    var xls = json2xls(applicantJSON);
-    fs.writeFileSync('ranking.xlsx',xls,'binary');
+
+    const csv = parse(applicantJSON);
+    fs.writeFileSync('./information/ranking.csv',csv,'binary');
 
     res.end();
 });
 
-//downloads the file containing all the information of the applicants
-app.get('/api/professor/getInfo',(req, res) => {
-    //const url = ".xlsx";
-    //const fileName = path.basename(url); 
-    //const fileStream = fs.createWriteStream(fileName);
-    //res.pipe(fileStream);
-    /*const downloader = new DownloaderHelper('./data.xlsx', './information');
-    downloader.on('end',()=> console.log("Download Completed"))
-    downloader.start();*/
-    console.log("ok");
-res.download(__dirname+'/information/data.xlsx');  
-});
+// //downloads the file containing all the information of the applicants
+// app.get('/api/professor/getInfo',(req, res) => {
+//     //const url = ".xlsx";
+//     //const fileName = path.basename(url); 
+//     //const fileStream = fs.createWriteStream(fileName);
+//     //res.pipe(fileStream);
+//     /*const downloader = new DownloaderHelper('./data.xlsx', './information');
+//     downloader.on('end',()=> console.log("Download Completed"))
+//     downloader.start();*/
+//     console.log("ok");
+// res.download(__dirname+'/information/data.xlsx');  
+// });
 
 
 app.post('/api/admin/addCourse', (req, res) => {
