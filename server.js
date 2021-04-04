@@ -181,6 +181,13 @@ app.get('/api/admin/downloadResults', (req, res) => {
     res.download(path.join(__dirname, '/information/results.csv'));
 })
 
+app.post('/api/admin/uploadResults', (req, res) => {
+    const {resultsJSON} = req.body;
+    const csv = parse(resultsJSON);
+    fs.writeFileSync('./information/results.csv',csv,'binary');
+    res.end();
+})
+
 app.post('/api/admin/createUser', (req, res) => {
     let { email, password } = req.body;
     admin.auth().createUser({

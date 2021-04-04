@@ -9,6 +9,7 @@ function MatchingTA() {
 
     const [taList, setTAList] = useState(undefined);
     const [applicantList, setApplicantList] = useState(undefined);
+    const [resultsList, setResultsList] = useState(undefined);
     const [bool, setBool] = useState(true);
     const [data, setData] = useState([{}]);
     
@@ -47,8 +48,11 @@ function MatchingTA() {
         if(number === 1) {
             setTAList(file);
         }
-        else {
+        else if(number === 2){
             setApplicantList(file);
+        }
+        else {
+            setResultsList(file);
         }
     }
 
@@ -62,8 +66,28 @@ function MatchingTA() {
         });
     }
 
-    function handleUpload() {
-
+    async function handleUpload() {
+        let xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        if(resultsList === undefined) {
+            alert("Please enter a file.");
+            return;
+        }
+        if(resultsList.type === xlsx) {
+            let resultsJSON = await readXlsxFile(resultsList);
+            let data = {
+                resultsJSON: resultsJSON
+            };
+            axios.post('/api/admin/uploadResults', data)
+                .then((res) => {
+                    alert("DONE");
+                })
+                .catch((err) => {
+                    alert("Failure. :(");
+                });
+        }
+        else {
+            alert("Files must either xlsx file format.");
+        }
     }
 
     return (
@@ -87,6 +111,11 @@ function MatchingTA() {
                             </div>
                             <p className="title"><strong>Results</strong></p>
                             <button onClick={() => handleDownload()}>Download</button> 
+                            <br />
+                            <div className="upload">
+                                <label htmlFor="applicantList">Upload the Updated Results:</label>
+                                <input onChange={(event) => handleChange(3, event.target.files[0])} type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                            </div>
                             <button onClick={() => handleUpload()}>Upload Changes</button> 
                         </div>
                     </div>
