@@ -243,7 +243,6 @@ app.post('/api/admin/sendApplicants', async (req,res)=>{
 app.post('/api/professor/sendRankings', async (req, res) => {
     const {applicantJSON} = req.body;
 
-
     const csv = parse(applicantJSON);
     fs.writeFileSync('./information/ranking.csv',csv,'binary');
 
@@ -303,6 +302,11 @@ app.get('/api/admin/getCourseData', async (req, res) => {
     });
     res.send(data); //send array of course data
 })
+
+//downloads the file containing information of the applicants with professor ranking
+app.get('/api/admin/getProfRanking',(req, res) => {
+    res.download(path.join(__dirname, '/information/data.csv')); 
+});
 
 app.get('', (req, res) => {
     res.sendFile(path.join(__dirname + '/client/build/index.html'));

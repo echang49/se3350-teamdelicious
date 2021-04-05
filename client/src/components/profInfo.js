@@ -3,6 +3,7 @@ import axios from "axios";
 import ProfNav from "./profNav";
 import readXlsxFile from "read-excel-file";
 import fileDownload from "js-file-download";
+import csv from 'csv-parser';
 
 function ProfInfo() {
   const [file, setFile] = useState();
@@ -11,29 +12,55 @@ function ProfInfo() {
     let xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     let xls = "application/vnd.ms-excel";
     let csv = ".csv";
-
+    
     if (file === undefined) {
       alert("Please enter a file.");
       return;
     }
 
-    if (file.type === xlsx || file.type === xls || file === csv) {
-      let applicantJSON = await readXlsxFile(file);
-      let data = {
-        applicantJSON: applicantJSON
-      };
-      axios.post('/api/professor/sendRankings', data)
-        .then((res) => {
-          alert("Done");
-        })
-        .catch((err) => {
-          alert("Failure. :(")
-        });
+    if (file.name.split('.').pop() === 'csv') {
+      // file.type = '.csv';
     }
 
+    console.log(file.type, file);
+
+    //upload file
+    if (file.type === xlsx || file.type === xls) {
+      try {
+        let applicantJSON = await readXlsxFile(file);
+        postApplicantFile(applicantJSON);
+      } catch (error) {
+        // CSV file
+        const reader = new FileReader();
+        reader.onload = () => {
+            console.log(reader.result);
+            const applicantJSON = reader.result
+              .split('\n')
+              .map(line => line.split(',').map(entry => entry.replace(/^"|"$/g, '')));
+            postApplicantFile(applicantJSON);
+        };
+        reader.readAsText(file);
+      }
+    }
     else {
       alert("Files must either be csv, xls, or xlsx file format.");
     }
+  }
+
+  function postApplicantFile (applicantJSON) {
+    console.log({applicantJSON});
+    const data = {
+      applicantJSON: applicantJSON
+    };
+
+    //extract data
+    axios.post('/api/professor/sendRankings', data) //send data to backend
+      .then((res) => {
+        alert("Done");
+      })
+      .catch((err) => {
+        alert("Failure. :(")
+      })
   }
 
   async function handleDownload() {
