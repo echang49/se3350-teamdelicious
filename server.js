@@ -9,7 +9,7 @@ const { admin, firestore, auth } = require("./firebase")
 const multer = require('multer');
 var upload = multer();
 const fs = require('fs');
-const Downloader = require('nodejs-file-downloader');
+//const Downloader = require('nodejs-file-downloader');
 
 const { parse } = require ('json2csv');
 const { fstat } = require('fs');
@@ -209,6 +209,7 @@ app.post('/api/admin/createUser', (req, res) => {
 //upload spreadsheet of applicants
 app.post('/api/admin/sendApplicants', async (req,res)=>{
     const {applicantJSON} = req.body;
+    const {applicants} = req.body;
     //console.log("hello");
     console.log(applicantJSON);
 
@@ -217,9 +218,9 @@ app.post('/api/admin/sendApplicants', async (req,res)=>{
     fs.writeFileSync('./information/data.csv',csv,'binary');
 
     //with applicantJSON, delete the rows that have Q,A, etc... and column "Professor Rank"
-    console.log(applicantJSON[1]);
-
-    /*for(let i of applicantJSON) {
+    /*console.log(applicantJSON[1]);
+    console.log("hello");
+    for(let i of applicantJSON) {
         for(let j of applicantJSON[i]){
          if (typeof j == 'string') {
                 if (j.includes('?')) {
@@ -250,17 +251,9 @@ app.post('/api/professor/sendRankings', async (req, res) => {
 });
 
 // //downloads the file containing all the information of the applicants
-// app.get('/api/professor/getInfo',(req, res) => {
-//     //const url = ".xlsx";
-//     //const fileName = path.basename(url); 
-//     //const fileStream = fs.createWriteStream(fileName);
-//     //res.pipe(fileStream);
-//     /*const downloader = new DownloaderHelper('./data.xlsx', './information');
-//     downloader.on('end',()=> console.log("Download Completed"))
-//     downloader.start();*/
-//     console.log("ok");
-// res.download(__dirname+'/information/data.xlsx');  
-// });
+app.get('/api/professor/getInfo',(req, res) => {
+    res.download(path.join(__dirname, '/information/data.csv')); 
+});
 
 
 app.post('/api/admin/addCourse', (req, res) => {

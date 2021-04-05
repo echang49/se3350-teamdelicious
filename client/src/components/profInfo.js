@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import ProfNav from "./profNav";
 import readXlsxFile from "read-excel-file";
+import fileDownload from "js-file-download";
 
 function ProfInfo() {
   const [file, setFile] = useState();
@@ -38,10 +39,11 @@ function ProfInfo() {
   async function handleDownload() {
     axios.get('/api/professor/getInfo')
     .then((res) => {
-      //console.log(res.data);
-      //alert("DONE")
-      //window.open('/api/professor/getInfo');
-    })
+      fileDownload(res.data, 'data.csv');
+  })
+  .catch((err) => {
+      console.log(err);
+  });
   }
 
   //Rank TA front end for uploading rankings
