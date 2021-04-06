@@ -36,8 +36,29 @@ function findColumn(json, name) {
     return undefined;
 }
 
+function findTAHours(csv, course) {
+    for(let i of csv) {
+        if(i[0] === course) {
+            return parseInt(i[1], 10);
+        }
+    }
+    return 0;
+}
+
+const csv2json = (str) => {
+    let results = [];
+    results = str.split(/\r\n|\n|\r/);
+    for(let i in results) {
+        results[i] = results[i].replace(/['"]+/g, '');
+        results[i] = results[i].split(",");
+    }
+    return results;
+};
+
 app.post('/api/admin/matchTA', (req, res) => {
     const { applicantJSON, coursesJSON } = req.body;
+    let csv = fs.readFileSync('./information/hours.csv', 'utf8');
+    csv = csv2json(csv);
 
     //COLUMN LOCATIONS
     let courseLocation = [findColumn(applicantJSON, 'Course Code'), findColumn(coursesJSON, 'Course Code')];
@@ -128,7 +149,7 @@ app.post('/api/admin/matchTA', (req, res) => {
     for (i = 1; i < coursesJSON.length; i++) {
         let course = {
             courseCode: coursesJSON[i][0],
-            hoursToFill: 20,
+            hoursToFill: findTAHours(csv, coursesJSON[i][0]),
             hoursFilled: 0,
             TAs: []
         }
@@ -173,8 +194,8 @@ app.post('/api/admin/matchTA', (req, res) => {
         results.push(temp);
     }
 
-    const csv = parse(results);
-    fs.writeFileSync('./information/results.csv',csv,'binary');
+    const csv2 = parse(results);
+    fs.writeFileSync('./information/results.csv',csv2,'binary');
 })
 
 app.get('/api/admin/downloadResults', (req, res) => {
@@ -209,32 +230,19 @@ app.post('/api/admin/createUser', (req, res) => {
 //upload spreadsheet of applicants
 app.post('/api/admin/sendApplicants', async (req,res)=>{
     const {applicantJSON} = req.body;
-    const {applicants} = req.body;
-    //console.log("hello");
-    console.log(applicantJSON);
 
     //keep this because we need this
     const csv = parse(applicantJSON);
     fs.writeFileSync('./information/data.csv',csv,'binary');
 
-    //with applicantJSON, delete the rows that have Q,A, etc... and column "Professor Rank"
-    /*console.log(applicantJSON[1]);
-    console.log("hello");
-    for(let i of applicantJSON) {
-        for(let j of applicantJSON[i]){
-         if (typeof j == 'string') {
-                if (j.includes('?')) {
-                   delete applicantJSON[i][j];
-                   delete applicantJSON[i][j+1];
-                }
-            }
-        }
-    }*/
-
-    //add column to the end that says professor rank
-    //var xls2 = json2xls(applicantJSON);
-    //fs.writeFileSync('rankings.xlsx',xls2,'binary');
-
+    //see what index q1 starts at Q1
+    let question = applicantJSON[0].indexOf('Q1')
+    for(let i in applicantJSON) {
+        applicantJSON[i] = applicantJSON[i].slice(0, question);
+    }
+    applicantJSON[0].push('Professor Rank');
+    const csv2 = parse(applicantJSON);
+    fs.writeFileSync('./information/rankings.csv',csv2,'binary');
 
     res.end();
 })
@@ -244,7 +252,7 @@ app.post('/api/professor/sendRankings', async (req, res) => {
     const {applicantJSON} = req.body;
 
     const csv = parse(applicantJSON);
-    fs.writeFileSync('./information/ranking.csv',csv,'binary');
+    fs.writeFileSync('./information/rankings.csv',csv,'binary');
 
     res.end();
 });
@@ -254,6 +262,9 @@ app.get('/api/professor/getInfo',(req, res) => {
     res.download(path.join(__dirname, '/information/data.csv')); 
 });
 
+app.get('/api/professor/getRankings',(req, res) => {
+    res.download(path.join(__dirname, '/information/rankings.csv')); 
+});
 
 app.post('/api/admin/addCourse', (req, res) => {
     let {courseCode, professor}  = req.body;
@@ -305,18 +316,46 @@ app.get('/api/admin/getCourseData', async (req, res) => {
 
 //downloads the file containing information of the applicants with professor ranking
 app.get('/api/admin/getProfRanking',(req, res) => {
-    res.download(path.join(__dirname, '/information/data.csv')); 
+    res.download(path.join(__dirname, '/information/rankings.csv')); 
 });
+
+app.post('/api/admin/setTAHours',(req, res) => {
+    const {hoursJSON} = req.body;
+
+    let courseLocation = findColumn(hoursJSON, 'Course Code');
+    let hoursLocation = findColumn(hoursJSON, 'Previous TA hours');
+    let lastLocation = findColumn(hoursJSON, 'Previous Enrollments');
+    let currentLocation = findColumn(hoursJSON, 'Current Enrollemnts');
+
+    //No. Of TA hours = (No. of Hours laster year / No. of enrollments last year) * current enrollment
+    let results = [['Course Code', 'TA Hours']];
+    for(let i = 1; i < hoursJSON.length; i++) {
+        let temp = (hoursJSON[i][hoursLocation] / hoursJSON[i][lastLocation]) * hoursJSON[i][currentLocation];
+        results.push([hoursJSON[i][courseLocation], temp]);
+    }
+
+    const csv = parse(results);
+    fs.writeFileSync('./information/hours.csv',csv,'binary');
+
+    res.end();
+});
+
+app.post('/api/admin/updateTAHours',(req, res) => {
+    const {hoursJSON} = req.body;
+
+    const csv = parse(hoursJSON);
+    fs.writeFileSync('./information/hours.csv',csv,'binary');
+
+    res.end();
+});
+
+app.get('/api/admin/getTaHours', (req, res) => {
+    res.download(path.join(__dirname, '/information/hours.csv'));
+})
 
 app.get('', (req, res) => {
     res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
 
-//Pseudo code to calculate hours
-app.get( () => {
-
-
-    
-}) 
 
 app.listen(5000);

@@ -3,7 +3,6 @@ import axios from "axios";
 import ProfNav from "./profNav";
 import readXlsxFile from "read-excel-file";
 import fileDownload from "js-file-download";
-import csv from 'csv-parser';
 
 function ProfInfo() {
   const [file, setFile] = useState();
@@ -73,6 +72,16 @@ function ProfInfo() {
   });
   }
 
+  async function handleDownload2() {
+    axios.get('/api/professor/getRankings')
+    .then((res) => {
+      fileDownload(res.data, 'rankings.csv');
+  })
+  .catch((err) => {
+      console.log(err);
+  });
+  }
+
   //Rank TA front end for uploading rankings
   return (
     <div>
@@ -83,8 +92,10 @@ function ProfInfo() {
           <label>File</label>
           <input onChange={(event) => setFile(event.target.files[0])} type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
           <button onClick={() => handleSubmit()}>Upload</button>
-          <p className="title"><strong>Download Professor Rankings</strong></p>
+          <p className="title"><strong>Download Applicant Info</strong></p>
           <button onClick={() => handleDownload()}>Download</button>
+          <p className="title"><strong>Download Professor Rankings</strong></p>
+          <button onClick={() => handleDownload2()}>Download</button>
         </div>
       </div>
     </div>

@@ -1,38 +1,5 @@
-"0","1","2","3","4","5","6","7","8"
-"Please Note That:",,,,,,,,
-"These marks are based on what you have so far and it will be updated every sprint",,,,,,,,
-"The marks for the must-have are multiplied by 2 to give it more wieght",,,,,,,,
-,"Implementation",,,,"Testing",,,"sub-total"
-,"Not Implemented (0)","Partially Implementation (10)","Fully Implemented (20)",,"Not tested (0)","partially tested (10)","fully tested (20)",
-"Preparing and receiving applications (Should-have)",,,,,,,5,5
-"1. ECE department determines the courses requiring TA positions",,,10,,,,,10
-"2. The course instructor determines the qualifications needed by each course and a set of questions they would like the TA to answer as part of the application",,,,,,,,0
-"3. The course information and the qualifying questions are sent to the faculty in a spreadsheet.",,,,,,,,0
-"4. The graduate students apply for the courses they want through the faculty (external to the department so the new system needs to include the ability to extract a spreadsheet with the given information)",,,,,,,,0
-"5. The faculty sends a spreadsheet with the applicant names and a list of the courses (ranked based on the students preference) they applied for, along with the answers to the qualifying questions.",,,,,,,,0
-"Instructors Rankings of applicants (Must-have 2nd priority)",,,,,,,,
-"1. The department sends the applicants information to the course instructors.",,,,,,,,0
-"2. The instructor ranks the applicants and sends the spreadsheet back to the department.",,,,,,,,0
-"Allocating the TA hours to the courses (Should-have)",,,,,,,,0
-"1. The undergraduate chair receives a spreadsheet from the registrar, including the number of students registered in each course for the last and the current year.",,,,,,,,0
-"2. The chair calculates the initial number of TA hours to allocate the course based on the following formula.",,,,,,,,0
-"No. Of TA hours = (No. of Hours laster year / No. of enrollments last year) * current enrollment",,,,,,,,
-"Matching the TA and the courses and the number of hours (Must-have 1st priority)",,,,,,,,
-"The department takes a number of rounds on matching the TA with the courses attempting to meet the following criteria.",,,10,,,,,20
-"a. Meet the applicants preferences.",,,,,,,,0
-"b. Meet the professors preferences.",,,,,,,,0
-"c. Meet the hiring prioritization as required by the school of graduate studies",,,,,,,,0
-"i. (1st priority) students within their term and fundable.",,,,,,,,0
-"ii. (2nd priority) students passed their term and officially unfundable.",,,,,,,,0
-"iii. (3rd priority) external hires.",,,,,,,,0
-"d. Meet the hour allocation requirements by the department",,,,,,,,0
-"i. New students get 5 hrs/week.",,,,,,,,0
-"ii. Experienced students (TAed before) get 10 hrs/week",,,,,,,,0
-"iii. Avoid splitting the TA hrs among multiple courses (if possible).",,,,,,,,0
-"upon latest discussion with the undergraduate chair he indicated the following regarding the prioritization of the different criteria mentioned here",,,,,,,,
-"Criteria (a and b specifically) need to be flexible.",,,,,,,,0
-"Typically (c) is done first. I'd like to be able to do (a) second and (b) third or the reverse.",,,,,,,,0
-"Instructor Feedback & Manual Adjustments (Should-have)",,,,,,,,
-"1. The instructor can review the TA allocations and accept or reject the suggestions.",,,0,,,,,0
-"2. The department admin or the chair can make manual adjustments for the TA allocation, including the insertion of new names that didn't come with the original application process.",,,0,,,,,0
-,,,,,,,"Total",35
+"0","1","2","3","4","5"
+"Course Code","Hours to Fill","TAs (TA then Hour)",,,
+"SE123",24,"alice@uwo.ca",5,"bob@uwo.ca",10
+"ECE456",44,"derek@uwo.ca",5,"charles@uwo.ca",10
+"ES678",16,,,,

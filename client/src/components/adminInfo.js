@@ -2,12 +2,12 @@ import { useState } from "react";
 import axios from "axios";
 import AdminNav from "./adminNav";
 import readXlsxFile from "read-excel-file";
+import fileDownload from "js-file-download";
 
 function AdminInfo() {
   const [file, setFile] = useState();
 
   async function handleSubmit() {
-    const formData = new FormData();
     let xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     let xls = "application/vnd.ms-excel";
     let csv = ".csv";
@@ -35,6 +35,16 @@ function AdminInfo() {
     }
   }
 
+  async function handleDownload() {
+    axios.get('/api/admin/getProfRanking')
+    .then((res) => {
+      fileDownload(res.data, 'ranking.csv');
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+  }
+
   return (
     <div>
       <AdminNav />
@@ -44,6 +54,8 @@ function AdminInfo() {
           <label>File</label>
           <input onChange={(event) => setFile(event.target.files[0])} type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
           <button onClick={() => handleSubmit()}>Upload</button>
+          <p className="title"><strong>Download Professor Rankings</strong></p>
+          <button onClick={() => handleDownload()}>Download</button>
         </div>
       </div>
     </div>

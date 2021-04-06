@@ -25,6 +25,7 @@ function AdminNav() {
                     <p>Engineering TA's</p>
                     <div className ="nav-body">
                         <p><Link to="/admin/uploadInfo">Upload Info</Link></p>
+                        <p><Link to="/admin/hours">TA Hours</Link></p>
                         <p><Link to="/admin/courses">Add Courses</Link></p>
                         <p><Link to="/admin/matchTA">Match TA's</Link></p>
                         <p><Link to="/admin/register">New Accounts</Link></p>
